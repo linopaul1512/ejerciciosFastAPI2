@@ -1,0 +1,2 @@
+# ejerciciosFastAPI2
+Ejercicios
