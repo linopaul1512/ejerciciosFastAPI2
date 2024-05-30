@@ -24,7 +24,7 @@ dummy_users_db = {
     "username": "johndoe",
     "email": "johndoe@example.com",
     "full_name": "John Doe",
-    "hashed_password": "27A0D7C4CCCE76E6BE39225B7EEE8BD0EF890DE82D49E459F4C405C583080AB0" ,
+    "hashed_password": "secret" ,
     "disabled": False
     
    },
