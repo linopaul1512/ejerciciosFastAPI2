@@ -1,4 +1,4 @@
-from typing import List, Union, Annotated
+from typing import List, Union, Annotated, Optional
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from pydantic import BaseModel

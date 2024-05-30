@@ -60,7 +60,7 @@ def update_evento(id: int, evento: Evento):
     return evento
 
 # Ruta para agregar notas a un evento existente
-@app.patch("/eventos/{id}/notas", response_model=Evento)
+@app.post("/eventos/{id}/notas", response_model=Evento)
 def agregar_notas(id: int, notas: str):
     index = next((i for i, e in enumerate(listaeventos) if e.id == id), None)
     if index is None:
