@@ -5,7 +5,7 @@ from sqlApp.database import Base
 
 
 class User(Base):
-    __tablename__ = "users"
+    __tablename__ = "userse"
 
     id= Column(Integer, primary_key=True)
     email= Column(String, unique=True, index=True)
@@ -20,6 +20,6 @@ class Item(Base):
     id = Column(Integer, primary_key=True)
     title = Column(String, index=True)
     description = Column(String, index=True)
-    owner_id = Column(Integer, ForeignKey("users.id"))
+    owner_id = Column(Integer, ForeignKey("userse.id"))
 
     owner = relationship("User", back_populates="items")

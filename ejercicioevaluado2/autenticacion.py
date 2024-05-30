@@ -17,8 +17,25 @@ SECRET_KEY = "27A0D7C4CCCE76E6BE39225B7EEE8BD0EF890DE82D49E459F4C405C583080AB0"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
-# Base de datos simulada para usuarios (lista en lugar de una base de datos real)
-dummy_users_db = []
+
+
+dummy_users_db = {
+   "johndoe": {
+    "username": "johndoe",
+    "email": "johndoe@example.com",
+    "full_name": "John Doe",
+    "hashed_password": "27A0D7C4CCCE76E6BE39225B7EEE8BD0EF890DE82D49E459F4C405C583080AB0" ,
+    "disabled": False
+    
+   },
+   "alice": {
+    "username": "alice",
+    "email": "alice@example.com",
+    "full_name": "Alice Wonderson",
+    "hashed_password": "27A0D7C4CCCE76E6BE39225B7EEE8BD0EF890DE82D49E459F4C405C583080AB0" ,
+    "disabled": True
+   } 
+}
 
 # Esquema de seguridad OAuth2 para obtener el token
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -29,6 +46,7 @@ class User(BaseModel):
     email: Union[str, None] = None
     full_name: Union[str, None] = None
     disabled: Union[bool, None] = None
+    hashed_password: str
 
 class UserInDB(User):
     hashed_password: str
