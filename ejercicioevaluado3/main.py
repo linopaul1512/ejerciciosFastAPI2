@@ -6,7 +6,7 @@ import crud, models, schemas
 from sqlApp.database import SessionLocal, engine
 from starlette.responses import RedirectResponse, HTMLResponse
 from starlette.status import HTTP_303_SEE_OTHER
-
+from fastapi import Depends
 # Crear todas las tablas en la base de datos
 models.Base.metadata.create_all(bind=engine)
 
