@@ -65,29 +65,29 @@ async def get_item(request: Request, item_id: int, db: Session = Depends(get_db)
     """
     Esta ruta maneja la solicitud GET a la URL "/items/{item_id}".
     Busca un item en la base de datos por su ID. Si el item no existe, lanza un HTTP 404.
-    Si el item existe, renderiza la plantilla 'item_edit.html', pasando el item a la plantilla.
+    Si el item existe, renderiza la plantilla 'detalles.item', pasando el item a la plantilla.
     """
     db_item = crud.item_id(db, item_id=item_id)
     if db_item is None:
         raise HTTPException(status_code=404, detail="Item not found")
-    return templates.TemplateResponse("item_edit.html", {"request": request, "item": db_item})
+    return templates.TemplateResponse("detalles.html", {"request": request, "item": db_item})
 
 # Ruta para mostrar el formulario de modificar item
 @app.get("/items/update/{item_id}", response_class=HTMLResponse)
-async def edit_item_form(request: Request, item_id: int, db: Session = Depends(get_db)):
+async def modificar_item_form(request: Request, item_id: int, db: Session = Depends(get_db)):
     """
     Esta ruta maneja la solicitud GET a la URL "/items/update/{item_id}".
     Busca un item en la base de datos por su ID. Si el item no existe, lanza un HTTP 404.
-    Si el item existe, renderiza la plantilla 'item_edit.html', pasando el item a la plantilla para su edición.
+    Si el item existe, renderiza la plantilla 'modificarItem.html', pasando el item a la plantilla para su edición.
     """
     item = crud.get_item(db, item_id)
     if item is None:
         raise HTTPException(status_code=404, detail="Item not found")
-    return templates.TemplateResponse("item_edit.html", {"request": request, "item": item})
+    return templates.TemplateResponse("modificarItem.html", {"request": request, "item": item})
 
 # Ruta para modificar item
 @app.post("/items/update/{item_id}", response_class=HTMLResponse)
-async def edit_item(request: Request, item_id: int, name: str = Form(...), description: str = Form(...), db: Session = Depends(get_db)):
+async def mopdificar_item(request: Request, item_id: int, name: str = Form(...), description: str = Form(...), db: Session = Depends(get_db)):
     """
     Esta ruta maneja la solicitud POST a la URL "/items/update/{item_id}".
     Recibe los datos del formulario (nombre y descripción) y actualiza el item en la base de datos.
