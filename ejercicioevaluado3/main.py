@@ -16,6 +16,7 @@ app = FastAPI()
 # Montar el directorio estático para servir archivos estáticos
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
+#Ya 
 # Configurar Jinja2 para la renderización de plantillas
 templates = Jinja2Templates(directory="templates")
 
