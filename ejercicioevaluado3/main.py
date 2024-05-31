@@ -87,7 +87,7 @@ async def modificar_item_form(request: Request, item_id: int, db: Session = Depe
 
 # Ruta para modificar item
 @app.post("/items/update/{item_id}", response_class=HTMLResponse)
-async def mopdificar_item(request: Request, item_id: int, name: str = Form(...), description: str = Form(...), db: Session = Depends(get_db)):
+async def modificar_item(request: Request, item_id: int, name: str = Form(...), description: str = Form(...), db: Session = Depends(get_db)):
     """
     Esta ruta maneja la solicitud POST a la URL "/items/update/{item_id}".
     Recibe los datos del formulario (nombre y descripción) y actualiza el item en la base de datos.
