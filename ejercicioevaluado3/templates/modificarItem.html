@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+
+
+    
+
+
+    <h1 class="titulo"> {% block title %} Modifique el item {% endblock %}</h1>
+
+
+
+        <form class method="post" form action="/item/update/{{ item.id }}">
+
+            <article>
+                <div>
+                    <label for="name">Nombre: </label><br>
+                    <input type="text" class="form-control" name="name" 
+                    placeholder="Nombre">
+                    <br>
+                </div>
+
+                <div>
+                    <label for="decription">Descripción: </label><br>
+                    <input type="text" class="form-control" name="decription" 
+                    placeholder="decription">
+                    <br>
+                </div>
+                <input div="formcenter" type="submit" value="Submit">
+            </article>
+        </form>
+
+        
+
+{% endblock %}

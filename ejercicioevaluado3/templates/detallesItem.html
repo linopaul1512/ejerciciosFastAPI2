@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>{% block title %} Item{% endblock %}</h1>
+    <ul>
+        <li>
+           Name: {{ item.name }} 
+           Descripción: {{ item.decripcion }} 
+           <a href="/items/update/{{ item.id }}/">Edit</a>
+        </li>
+    </ul>
+{% endblock %}
+
+
+
+

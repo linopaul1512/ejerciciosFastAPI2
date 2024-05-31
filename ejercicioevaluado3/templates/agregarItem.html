@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+
+    <h1 class="titulo"> Agregue un item</h1>
+
+
+
+        <form action="/item/create/" method="post">
+
+            <article>
+                <div>
+                    
+                    <label for="name">Nombre: </label><br>
+                    <input type="text" class="form-control" name="name" 
+                    placeholder="Nombre">
+                    <br>
+                </div>
+
+                <div>
+                    <label for="decription">Descripción: </label><br>
+                    <input type="text" class="form-control" name="decription" 
+                    placeholder="decription">
+                    <br>
+                </div>
+                <input div="formcenter" type="submit" value="Submit">
+            </article>
+        </form>
+
+        
+
+{% endblock %}

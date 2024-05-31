@@ -17,24 +17,22 @@ SECRET_KEY = "27A0D7C4CCCE76E6BE39225B7EEE8BD0EF890DE82D49E459F4C405C583080AB0"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
-
-
+# Base de datos simulada de usuarios
 dummy_users_db = {
-   "johndoe": {
-    "username": "johndoe",
-    "email": "johndoe@example.com",
-    "full_name": "John Doe",
-    "hashed_password": "secret" ,
-    "disabled": False
-    
-   },
-   "alice": {
-    "username": "alice",
-    "email": "alice@example.com",
-    "full_name": "Alice Wonderson",
-    "hashed_password": "27A0D7C4CCCE76E6BE39225B7EEE8BD0EF890DE82D49E459F4C405C583080AB0" ,
-    "disabled": True
-   } 
+    "johndoe": {
+        "username": "johndoe",
+        "email": "johndoe@example.com",
+        "full_name": "John Doe",
+        "hashed_password": "secret",  
+        "disabled": False
+    },
+    "alice": {
+        "username": "alice",
+        "email": "alice@example.com",
+        "full_name": "Alice Wonderson",
+        "hashed_password": "secret", 
+        "disabled": True
+    }
 }
 
 # Esquema de seguridad OAuth2 para obtener el token
@@ -43,10 +41,9 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 # Modelos Pydantic para la gestión de usuarios y tokens
 class User(BaseModel):
     username: str
-    email: Union[str, None] = None
-    full_name: Union[str, None] = None
-    disabled: Union[bool, None] = None
-    hashed_password: str
+    email: Optional[str] = None
+    full_name: Optional[str] = None
+    disabled: Optional[bool] = None
 
 class UserInDB(User):
     hashed_password: str
@@ -56,10 +53,10 @@ class Token(BaseModel):
     token_type: str
 
 class TokenData(BaseModel):
-    username: Union[str, None] = None
+    username: Optional[str] = None
 
 # Función para crear un token JWT
-def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None):
+def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode = data.copy()
     if expires_delta:
         expire = datetime.now(timezone.utc) + expires_delta
@@ -70,19 +67,18 @@ def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None
     return encoded_jwt
 
 # Función para obtener el hash de una contraseña
-def get_password_hash(password):
+def get_password_hash(password: str):
     return pwd_context.hash(password)
 
 # Función para verificar una contraseña en texto plano contra su hash
-def verify_password(plain_password, hashed_password):
+def verify_password(plain_password: str, hashed_password: str):
     return pwd_context.verify(plain_password, hashed_password)
 
 # Función para obtener un usuario de la base de datos simulada
 def get_user(db, username: str):
-    for user in db:
-        if user.username == username:
-            return user
-    return None
+    if username in db:
+        user_dict = db[username]
+        return UserInDB(**user_dict)
 
 # Función para autenticar un usuario verificando su contraseña
 def authenticate_user(fake_db, username: str, password: str):
@@ -114,12 +110,27 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
     return user
 
 # Ruta para registrar un nuevo usuario
+class UserCreate(BaseModel):
+    username: str
+    email: Optional[str] = None
+    full_name: Optional[str] = None
+    password: str
+    
+#Ruta para crear usuario
 @app.post("/usuarios/", response_model=User)
-def crear_usuario(user: User):
+def crear_usuario(user: UserCreate):
     hashed_password = get_password_hash(user.password)
-    user_in_db = UserInDB(**user.dict(), hashed_password=hashed_password)
-    dummy_users_db.append(user_in_db)
-    return user
+    user_in_db = UserInDB(
+        username=user.username,
+        email=user.email,
+        full_name=user.full_name,
+        disabled=False,
+        hashed_password=hashed_password
+    )
+    if user_in_db.username in dummy_users_db:
+        raise HTTPException(status_code=400, detail="Username already registered")
+    dummy_users_db[user_in_db.username] = user_in_db.dict()
+    return user_in_db
 
 # Ruta para iniciar sesión y obtener el token de acceso
 @app.post("/token", response_model=Token)
@@ -136,3 +147,10 @@ async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm,
         data={"sub": user.username}, expires_delta=access_token_expires
     )
     return {"access_token": access_token, "token_type": "bearer"}
+
+# Ruta para obtener la información del usuario actual
+@app.get("/users/me", response_model=User)
+async def read_users_me(current_user: Annotated[User, Depends(get_current_user)]):
+    return current_user
+
+

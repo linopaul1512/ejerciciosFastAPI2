@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+
+
+{% block content %}
+<h1>{% block title %} Mi lista {% endblock %}</h1>
+    
+    
+    <table id="formcenter">
+
+        <tr>
+            <th>ID Item</th>
+            <th>Nombre</th>
+            <th>Descripción </th>
+        </tr>
+        {% for item in items %}
+        <tr>
+            <td>{{ item.id }}</td>
+            <td>{{ item.name}} </td>
+            <td>{{ item.description }} </td>
+            <td class="css"> 
+                <button class="css" value="Modificar" onclick="window.location.href='/items/update/{{item.id}}' ;" >Modificar</button> 
+
+                <form action="{{url_for('delete_item', id=item_id) }}" method="post">
+                    <input class="css" type="submit" value="Eliminar">    
+                </form> 
+                
+            </td>
+
+        </tr>
+
+           
+           
+        {% endfor %}
+    </table>
+{% endblock %}
