@@ -29,86 +29,38 @@ def get_db():
         db.close()
 
 # Ruta para buscar todos los items
-@app.get("/", response_class=HTMLResponse)
+@app.get("/", response_class=HTMLResponse, name="read_items")
 async def read_items(request: Request, db: Session = Depends(get_db)):
-    """
-    Esta ruta maneja la solicitud GET a la URL raíz ("/").
-    Busca todos los items en la base de datos y renderiza la plantilla 'listaItem.html',
-    pasando la lista de items a la plantilla.
-    """
     items = crud.get_items(db)
     return templates.TemplateResponse("listaItem.html", {"request": request, "items": items})
 
-# Ruta para mostrar el formulario de crear item
-@app.get("/item/create/", response_class=HTMLResponse)
-async def create_item_form(request: Request):
-    """
-    Esta ruta maneja la solicitud GET a la URL "/item/create/".
-    Renderiza la plantilla 'agregarItem.html', que contiene el formulario para crear un nuevo item.
-    """
-    return templates.TemplateResponse("agregarItem.html", {"request": request})
-
 # Ruta para crear item
-@app.post("/item/create/", response_class=HTMLResponse)
-async def create_item(request: Request, name: str = Form(...), description: str = Form(...), db: Session = Depends(get_db)):
-    """
-    Esta ruta maneja la solicitud POST a la URL "/item/create/".
-    Recibe los datos del formulario (nombre y descripción) y crea un nuevo item en la base de datos.
-    Luego redirige a la URL raíz ("/") para mostrar la lista actualizada de items.
-    """
-    item = schemas.ItemCreate(name=name, description=description)
-    crud.create_item(db=db, item=item)
-    return RedirectResponse("/", status_code=HTTP_303_SEE_OTHER)
+@app.post("/item/create/", response_model=schemas.Item)
+async def create_item(item: schemas.ItemCreate, db: Session = Depends(get_db)):
+    return crud.create_item(db=db, item=item)
 
 # Ruta para buscar item por id
-@app.get("/items/{item_id}", response_class=HTMLResponse)
-async def get_item(request: Request, item_id: int, db: Session = Depends(get_db)):
-    """
-    Esta ruta maneja la solicitud GET a la URL "/items/{item_id}".
-    Busca un item en la base de datos por su ID. Si el item no existe, lanza un HTTP 404.
-    Si el item existe, renderiza la plantilla 'detalles.item', pasando el item a la plantilla.
-    """
-    db_item = crud.item_id(db, item_id=item_id)
-    if db_item is None:
-        raise HTTPException(status_code=404, detail="Item not found")
-    return templates.TemplateResponse("detalles.html", {"request": request, "item": db_item})
-
-# Ruta para mostrar el formulario de modificar item
-@app.get("/items/update/{item_id}", response_class=HTMLResponse)
-async def modificar_item_form(request: Request, item_id: int, db: Session = Depends(get_db)):
-    """
-    Esta ruta maneja la solicitud GET a la URL "/items/update/{item_id}".
-    Busca un item en la base de datos por su ID. Si el item no existe, lanza un HTTP 404.
-    Si el item existe, renderiza la plantilla 'modificarItem.html', pasando el item a la plantilla para su edición.
-    """
+@app.get("/item/{item_id}", response_class=HTMLResponse)
+async def read_item(request: Request, item_id: int, db: Session = Depends(get_db)):
     item = crud.get_item(db, item_id)
     if item is None:
         raise HTTPException(status_code=404, detail="Item not found")
-    return templates.TemplateResponse("modificarItem.html", {"request": request, "item": item})
+    return templates.TemplateResponse("item_detail.html", {"request": request, "item": item})
 
 # Ruta para modificar item
-@app.post("/items/update/{item_id}", response_class=HTMLResponse)
-async def modificar_item(request: Request, item_id: int, name: str = Form(...), description: str = Form(...), db: Session = Depends(get_db)):
-    """
-    Esta ruta maneja la solicitud POST a la URL "/items/update/{item_id}".
-    Recibe los datos del formulario (nombre y descripción) y actualiza el item en la base de datos.
-    Luego redirige a la URL raíz ("/") para mostrar la lista actualizada de items.
-    """
-    item_update = schemas.ItemUpdate(name=name, description=description)
-    crud.update_item(db=db, item_id=item_id, item=item_update)
-    return RedirectResponse("/", status_code=HTTP_303_SEE_OTHER)
-
-# Ruta para eliminar item
-@app.post("/items/delete/{item_id}", response_class=HTMLResponse)
-async def delete_item(request: Request, item_id: int, db: Session = Depends(get_db)):
-    """
-    Esta ruta maneja la solicitud POST a la URL "/items/delete/{item_id}".
-    Busca un item en la base de datos por su ID. Si el item no existe, lanza un HTTP 404.
-    Si el item existe, lo elimina de la base de datos y redirige a la URL raíz ("/")
-    para mostrar la lista actualizada de items.
-    """
+@app.put("/items/update/{item_id}", response_model=schemas.Item)
+async def modificar_item(item_id: int, item_update: schemas.ItemUpdate, db: Session = Depends(get_db)):
     db_item = crud.get_item(db, item_id=item_id)
     if db_item is None:
         raise HTTPException(status_code=404, detail="Item not found")
-    crud.delete_item(db, item_id=item_id)
-    return RedirectResponse("/", status_code=HTTP_303_SEE_OTHER)
+    return crud.update_item(db=db, item_id=item_id, item_update=item_update)
+
+# Ruta para eliminar item
+@app.delete("/items/delete/{item_id}", response_model=schemas.Item)
+async def delete_item(item_id: int, db: Session = Depends(get_db)):
+    db_item = crud.get_item(db, item_id=item_id)
+    if db_item is None:
+        raise HTTPException(status_code=404, detail="Item not found")
+    
+    deleted_item = crud.delete_item(db, item_id=item_id)
+    return deleted_item

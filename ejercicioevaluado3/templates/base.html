@@ -11,7 +11,7 @@
     <header>
                 <img  src="/static/img/Icono.png" alt="Logo">
                 <nav>
-                    <a href="/item/create/">Create Item</a>
+                    <a href="{{ url_for('read_items') }}">Lista de items</a>
                 </nav>
             
     </header>
@@ -20,5 +20,11 @@
     <div class="banner">
         <img class="Banner_img" src="/static/img/Banner_1.png" alt="Banner_1"> 
     </div>
+
+    <div class="content">
+        {% block content %}
+        {% endblock %}
+    </div>
+
 </body>
 </html>

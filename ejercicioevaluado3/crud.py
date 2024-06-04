@@ -23,22 +23,23 @@ def create_item(db: Session, item: schemas.ItemCreate):
     return db_item
 
 #Modificar item
-def update_item(db: Session, item: schemas.ItemUpdate,  item_id: int):
-    db_item  = db.query(models.Item).filter(models.Item.id == item_id)
+def update_item(db: Session, item_id: int, item_update: schemas.ItemUpdate):
+    db_item = db.query(models.Item).filter(models.Item.id == item_id).first()
     if db_item:
-        db_item.name = item.name
-        db_item.description = item.description
+        db_item.name = item_update.name
+        db_item.description = item_update.description
         db.commit()
         db.refresh(db_item)
-        print("Db items: ", db_item)
-    return db_item
+        print("Updated item: ", db_item)
+        return db_item
+    return None
+
 
 #Delete item
-def delete_item(db: Session, item: schemas.ItemDelete,  item_id: int):
-    db_item  = db.query(models.Item).filter(models.Item.id == item_id)
+def delete_item(db: Session, item_id: int):
+    db_item = db.query(models.Item).filter(models.Item.id == item_id).first()
     if db_item:
-        print("DB item: ", db_item)
         db.delete(db_item)
         db.commit()
-        print("Db items: ", db_item)
-    return db_item
+        return db_item
+    return None
